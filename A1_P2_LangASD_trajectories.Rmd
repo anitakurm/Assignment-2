@@ -133,18 +133,23 @@ ggplot(d_temp, aes(Diagnosis, Age)) +
   geom_violin()
 
 #GENDER, glm - generalized linear model, can deal with any kind of predictor
-summary(glm(Gender~Diagnosis, family=binomial, d_temp))
+modgen<-glm(Gender~Diagnosis, family=binomial, d_temp)
+summary(modgen)
+r.squaredGLMM(modgen)
 counts = table(d_temp$Gender, d_temp$Diagnosis)
 barplot(counts,
-        col=c("green","blue"),
-        legend = rownames(counts))
+        col=c("pink","grey"),
+        legend = rownames(counts),
+        width = 0.6)
 
 #VIQ
 summary(glm(verbalIQ~Diagnosis, family=gaussian, d_temp)) #TDs are higher, nonsignificant
+r.squaredGLMM(glm(verbalIQ~Diagnosis, family=gaussian, d_temp))
 ggplot(d_temp, aes(Diagnosis,verbalIQ))+
   geom_violin()
 #nonvIQ
 summary(glm(nonVerbalIQ~Diagnosis, family=gaussian, d_temp)) #TDs are lower, non-significant
+r.squaredGLMM(glm(nonVerbalIQ~Diagnosis, family=gaussian, d_temp))
 ggplot(d_temp, aes(Diagnosis,nonVerbalIQ))+
   geom_violin()
 
@@ -247,9 +252,9 @@ data$VISIT<- as.factor(data$VISIT)
 ggplot(data, aes(VISIT, MOT_MLU))+geom_boxplot()+facet_wrap( ~ Diagnosis)
 
 data$VISIT<- as.numeric(data$VISIT)
-m3 <- lmer(MOT_MLU~VISIT+Diagnosis+(1+VISIT|SUBJ), data=data)
-summary(m3) #output
-r.squaredGLMM(m3)
+m7 <- lmer(MOT_MLU~VISIT+Diagnosis+(1+VISIT|SUBJ), data=data)
+summary(m7) #output
+r.squaredGLMM(m7)
 
 ```
 
@@ -269,11 +274,12 @@ model2<-lmer(CHI_MLU~1+VISIT+I(VISIT^2)+Diagnosis+(1+VISIT|SUBJ), data=data) #qu
 summary(model2)
 r.squaredGLMM(model2)
 
-model3 <- lmer(CHI_MLU~VISIT+Diagnosis+verbalIQ+(1+VISIT|SUBJ), data=data) #model by sofie and helene, visit and verbal iq are significant, r^2m=0.50861
+model3 <- lmer(CHI_MLU~VISIT+Diagnosis+verbalIQ+MOT_MLU+(1+VISIT|SUBJ), data=data) #new model, visit,verbal iq and mot mlu are significant, r^2m=0.55
 summary(model3) #output
 r.squaredGLMM(model3)
 
-model4<-lmer(CHI_MLU~1+VISIT+I(VISIT^2)+Diagnosis+verbalIQ+(1+VISIT|SUBJ), data=data) #seems to be pretty good, visit, visit^2 and verbal IQ are significant, r^2m=0.522
+
+model4<-lmer(CHI_MLU~VISIT+Age+MOT_MLU+verbalIQ+(1+VISIT|SUBJ), data=data) #seems to be pretty good
 summary(model4)
 r.squaredGLMM(model4)
 
